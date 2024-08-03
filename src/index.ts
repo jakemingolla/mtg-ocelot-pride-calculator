@@ -4,23 +4,27 @@ const CITYS_BLESSING = 10;
 
 const createTokensFromOcelotPrides = (
   remainingOcelots: PositiveInteger,
-  createdCats: PositiveInteger,
+  createdTokens: PositiveInteger,
   startingPermaments: PositiveInteger,
+  ocelotsCreateTokens: boolean,
 ): PositiveInteger => {
   if (remainingOcelots === 0) {
-    return createdCats;
+    return createdTokens;
   }
 
-  createdCats += 1;
+  if (ocelotsCreateTokens) {
+    createdTokens += 1;
+  }
 
-  if (startingPermaments + createdCats >= CITYS_BLESSING) {
-    createdCats += createdCats;
+  if (startingPermaments + createdTokens >= CITYS_BLESSING) {
+    createdTokens += createdTokens;
   }
 
   return createTokensFromOcelotPrides(
     remainingOcelots - 1,
-    createdCats,
+    createdTokens,
     startingPermaments,
+    ocelotsCreateTokens,
   );
 };
 
@@ -28,9 +32,20 @@ export const calculate = (
   ocelots: PositiveInteger,
   guides: PositiveInteger,
   permanents: PositiveInteger,
-): { catTokens: PositiveInteger; energy: PositiveInteger } => {
-  const catTokens = createTokensFromOcelotPrides(ocelots, 0, permanents);
+  treasureTokens: PositiveInteger = 0,
+): {
+  catTokens: PositiveInteger;
+  energy: PositiveInteger;
+  treasureTokens: PositiveInteger;
+} => {
+  const catTokens = createTokensFromOcelotPrides(ocelots, 0, permanents, true);
+  treasureTokens = createTokensFromOcelotPrides(
+    ocelots,
+    treasureTokens,
+    permanents,
+    false,
+  );
   const energy = guides * catTokens;
 
-  return { catTokens, energy };
+  return { catTokens, energy, treasureTokens };
 };

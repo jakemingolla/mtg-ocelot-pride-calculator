@@ -4,20 +4,23 @@ import type { PositiveInteger } from "../../src/types/positive-integer";
 const calculateWithOnly = (
   ocelots: PositiveInteger,
   guides: PositiveInteger,
+  treasureTokens: PositiveInteger = 0,
 ) => {
-  return calculate(ocelots, guides, ocelots + guides);
+  return calculate(ocelots, guides, ocelots + guides, treasureTokens);
 };
 
 const calculateWithCitysBlessing = (
   ocelots: PositiveInteger,
   guides: PositiveInteger,
+  treasureTokens: PositiveInteger = 0,
 ) => {
-  return calculate(ocelots, guides, 10);
+  return calculate(ocelots, guides, 10, treasureTokens);
 };
+
+const zeroGuides = 0;
 
 describe("calculate", () => {
   describe("only ocelots", () => {
-    const zeroGuides = 0;
     it("should return zero if given none", () => {
       const ocelots = 0;
       const result = calculateWithOnly(ocelots, zeroGuides);
@@ -119,6 +122,35 @@ describe("calculate", () => {
       const result = calculateWithCitysBlessing(ocelots, guides);
 
       expect(result.energy).toBe(126 * 6);
+    });
+  });
+
+  describe("with additional tokens", () => {
+    it("does not add tokens without the citys blessing", () => {
+      const ocelots = 2;
+      const treasureTokens = 2;
+      const result = calculateWithOnly(ocelots, zeroGuides, treasureTokens);
+      expect(result.treasureTokens).toBe(2);
+    });
+
+    it("doubles tokens with the citys blessing", () => {
+      const ocelots = 2;
+      const treasureTokens = 2;
+      const result = calculateWithCitysBlessing(
+        ocelots,
+        zeroGuides,
+        treasureTokens,
+      );
+      expect(result.treasureTokens).toBe(8);
+    });
+
+    it("only doubles once the citys blessing is reached", () => {
+      const ocelots = 2;
+      const permanents = 8;
+      const treasureTokens = 2;
+      const result = calculate(ocelots, zeroGuides, permanents, treasureTokens);
+
+      expect(result.treasureTokens).toBe(4);
     });
   });
 });
