@@ -2,7 +2,7 @@ import type { PositiveInteger } from "./types/positive-integer";
 
 const CITYS_BLESSING = 10;
 
-const foo = (
+const createTokensFromOcelotPrides = (
   remainingOcelots: PositiveInteger,
   createdCats: PositiveInteger,
   startingPermaments: PositiveInteger,
@@ -17,7 +17,11 @@ const foo = (
     createdCats += createdCats;
   }
 
-  return foo(remainingOcelots - 1, createdCats, startingPermaments);
+  return createTokensFromOcelotPrides(
+    remainingOcelots - 1,
+    createdCats,
+    startingPermaments,
+  );
 };
 
 export const calculate = (
@@ -25,7 +29,7 @@ export const calculate = (
   guides: PositiveInteger,
   permanents: PositiveInteger,
 ): { catTokens: PositiveInteger; energy: PositiveInteger } => {
-  const catTokens = foo(ocelots, 0, permanents);
+  const catTokens = createTokensFromOcelotPrides(ocelots, 0, permanents);
   const energy = guides * catTokens;
 
   return { catTokens, energy };
