@@ -1,8 +1,9 @@
 import type { PositiveInteger } from "./types/positive-integer";
+import type { CreatureToken, Token } from "./types/tokens";
+import { isCreatureToken } from "./types/tokens";
 
 const CITYS_BLESSING = 10;
-type Token = string;
-const CAT_TOKEN: Token = "cat-token";
+const CAT_TOKEN: CreatureToken = "cat-token";
 
 const createTokensFromOcelotPrides = (
   remainingOcelots: PositiveInteger,
@@ -40,28 +41,22 @@ export const calculate = (
   ocelots: PositiveInteger,
   guides: PositiveInteger,
   permanents: PositiveInteger,
-  treasureTokens: PositiveInteger = 0,
+  tokens: Record<Token, PositiveInteger>,
 ): {
-  catTokens: PositiveInteger;
   energy: PositiveInteger;
-  treasureTokens: PositiveInteger;
+  tokens: Record<Token, PositiveInteger>;
 } => {
-  const createdTokens = {
-    [CAT_TOKEN]: 0,
-    "treasure-token": treasureTokens,
-  };
-  const resultingTokens = createTokensFromOcelotPrides(
-    ocelots,
-    createdTokens,
-    permanents,
-  );
+  tokens[CAT_TOKEN] = 0;
+
+  tokens = createTokensFromOcelotPrides(ocelots, tokens, permanents);
 
   // TODO handle noncreate tokens
-  const energy = guides * resultingTokens[CAT_TOKEN];
+  const energy = Object.entries(tokens)
+    .filter(([token]) => isCreatureToken(token))
+    .reduce((acc, [, count]) => acc + count, 0);
 
   return {
-    catTokens: resultingTokens[CAT_TOKEN],
     energy,
-    treasureTokens: resultingTokens["treasure-token"],
+    tokens,
   };
 };

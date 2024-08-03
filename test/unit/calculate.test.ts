@@ -1,4 +1,5 @@
 import { calculate } from "../../src";
+import type { Token, NonCreatureToken } from "../../src/types/tokens";
 import type { PositiveInteger } from "../../src/types/positive-integer";
 
 const calculateWithOnly = (
@@ -6,12 +7,9 @@ const calculateWithOnly = (
   guides: PositiveInteger,
   treasureTokens: PositiveInteger = 0,
 ) => {
-  return calculate(
-    ocelots,
-    guides,
-    ocelots + guides + treasureTokens,
-    treasureTokens,
-  );
+  return calculate(ocelots, guides, ocelots + guides + treasureTokens, {
+    ["treasure-token" as NonCreatureToken]: treasureTokens,
+  });
 };
 
 const calculateWithCitysBlessing = (
@@ -19,7 +17,23 @@ const calculateWithCitysBlessing = (
   guides: PositiveInteger,
   treasureTokens: PositiveInteger = 0,
 ) => {
-  return calculate(ocelots, guides, 10, treasureTokens);
+  return calculate(ocelots, guides, 10, {
+    ["treasure-token" as NonCreatureToken]: treasureTokens,
+  });
+};
+
+const expectCatTokens = (
+  tokens: Record<Token, PositiveInteger>,
+  expected: PositiveInteger,
+) => {
+  expect(tokens["cat-token"]).toBe(expected);
+};
+
+const expectTreasueTokens = (
+  tokens: Record<Token, PositiveInteger>,
+  expected: PositiveInteger,
+) => {
+  expect(tokens["treasure-token"]).toBe(expected);
 };
 
 const zeroGuides = 0;
@@ -30,28 +44,28 @@ describe("calculate", () => {
       const ocelots = 0;
       const result = calculateWithOnly(ocelots, zeroGuides);
 
-      expect(result.catTokens).toBe(0);
+      expectCatTokens(result.tokens, 0);
     });
 
     it("should return 1 if given one ocelot without citys blessing", () => {
       const ocelots = 1;
       const result = calculateWithOnly(ocelots, zeroGuides);
 
-      expect(result.catTokens).toBe(1);
+      expectCatTokens(result.tokens, 1);
     });
 
     it("should return 2 if given one ocelot with citys blessing", () => {
       const ocelots = 1;
       const result = calculateWithCitysBlessing(ocelots, zeroGuides);
 
-      expect(result.catTokens).toBe(2);
+      expectCatTokens(result.tokens, 2);
     });
 
     it("should return 126 if given six ocelots with citys blessing", () => {
       const ocelots = 6;
       const result = calculateWithCitysBlessing(ocelots, zeroGuides);
 
-      expect(result.catTokens).toBe(126);
+      expectCatTokens(result.tokens, 126);
     });
 
     it("should handle up to thirty ocelots", () => {
@@ -59,16 +73,16 @@ describe("calculate", () => {
       const result = calculateWithCitysBlessing(ocelots, zeroGuides);
 
       // Judge!
-      expect(result.catTokens).toBe(2147483646);
+      expectCatTokens(result.tokens, 2147483646);
     });
 
     it("should only double once citys blessing is reached", () => {
       const ocelots = 2;
       const guides = 0;
       const permanents = 8;
-      const result = calculate(ocelots, guides, permanents);
+      const result = calculate(ocelots, guides, permanents, {});
 
-      expect(result.catTokens).toBe(4);
+      expectCatTokens(result.tokens, 4);
     });
   });
 
@@ -128,6 +142,28 @@ describe("calculate", () => {
 
       expect(result.energy).toBe(126 * 6);
     });
+
+    it("should not count noncreature tokens", () => {
+      const ocelots = 1;
+      const guides = 1;
+      const treasureTokens = 1;
+      const result = calculateWithOnly(ocelots, guides, treasureTokens);
+
+      expect(result.energy).toBe(1);
+    });
+
+    it("should not count noncreature tokens with the cits blessing", () => {
+      const ocelots = 1;
+      const guides = 1;
+      const treasureTokens = 1;
+      const result = calculateWithCitysBlessing(
+        ocelots,
+        guides,
+        treasureTokens,
+      );
+
+      expect(result.energy).toBe(2);
+    });
   });
 
   describe("with additional tokens", () => {
@@ -135,7 +171,7 @@ describe("calculate", () => {
       const ocelots = 2;
       const treasureTokens = 2;
       const result = calculateWithOnly(ocelots, zeroGuides, treasureTokens);
-      expect(result.treasureTokens).toBe(2);
+      expectTreasueTokens(result.tokens, 2);
     });
 
     it("doubles tokens with the citys blessing", () => {
@@ -146,16 +182,18 @@ describe("calculate", () => {
         zeroGuides,
         treasureTokens,
       );
-      expect(result.treasureTokens).toBe(8);
+      expectTreasueTokens(result.tokens, 8);
     });
 
     it("only doubles once the citys blessing is reached", () => {
       const ocelots = 2;
       const permanents = 6;
       const treasureTokens = 2;
-      const result = calculate(ocelots, zeroGuides, permanents, treasureTokens);
+      const result = calculate(ocelots, zeroGuides, permanents, {
+        ["treasure-token" as NonCreatureToken]: treasureTokens,
+      });
 
-      expect(result.treasureTokens).toBe(4);
+      expectTreasueTokens(result.tokens, 4);
     });
   });
 });
