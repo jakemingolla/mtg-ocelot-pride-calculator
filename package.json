@@ -13,7 +13,7 @@
     "prettier:format": "prettier --write --config './.prettierrc.js' --ignore-path './.prettierignore' ."
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "^1.1.6"
   },
   "peerDependencies": {
     "typescript": "^5.5.4"
