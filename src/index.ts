@@ -1,30 +1,38 @@
 import type { PositiveInteger } from "./types/positive-integer";
 
 const CITYS_BLESSING = 10;
+type Token = string;
+const CAT_TOKEN: Token = "cat-token";
 
 const createTokensFromOcelotPrides = (
   remainingOcelots: PositiveInteger,
-  createdTokens: PositiveInteger,
+  createdTokens: Record<Token, PositiveInteger>,
   startingPermaments: PositiveInteger,
-  ocelotsCreateTokens: boolean,
-): PositiveInteger => {
+): Record<Token, PositiveInteger> => {
   if (remainingOcelots === 0) {
     return createdTokens;
   }
 
-  if (ocelotsCreateTokens) {
-    createdTokens += 1;
-  }
+  console.log(`Creating ${CAT_TOKEN}`);
+  createdTokens[CAT_TOKEN] += 1;
 
-  if (startingPermaments + createdTokens >= CITYS_BLESSING) {
-    createdTokens += createdTokens;
+  const totalPermanents =
+    startingPermaments +
+    Object.values(createdTokens).reduce((acc, count) => acc + count, 0);
+
+  console.log(`There are ${totalPermanents} permanents.`);
+
+  if (totalPermanents >= CITYS_BLESSING) {
+    Object.entries(createdTokens).forEach(([token, count]) => {
+      console.log(`Doubling ${token} from ${count} to ${count * 2}`);
+      createdTokens[token] = count * 2;
+    });
   }
 
   return createTokensFromOcelotPrides(
     remainingOcelots - 1,
     createdTokens,
     startingPermaments,
-    ocelotsCreateTokens,
   );
 };
 
@@ -38,14 +46,22 @@ export const calculate = (
   energy: PositiveInteger;
   treasureTokens: PositiveInteger;
 } => {
-  const catTokens = createTokensFromOcelotPrides(ocelots, 0, permanents, true);
-  treasureTokens = createTokensFromOcelotPrides(
+  const createdTokens = {
+    [CAT_TOKEN]: 0,
+    "treasure-token": treasureTokens,
+  };
+  const resultingTokens = createTokensFromOcelotPrides(
     ocelots,
-    treasureTokens,
+    createdTokens,
     permanents,
-    false,
   );
-  const energy = guides * catTokens;
 
-  return { catTokens, energy, treasureTokens };
+  // TODO handle noncreate tokens
+  const energy = guides * resultingTokens[CAT_TOKEN];
+
+  return {
+    catTokens: resultingTokens[CAT_TOKEN],
+    energy,
+    treasureTokens: resultingTokens["treasure-token"],
+  };
 };

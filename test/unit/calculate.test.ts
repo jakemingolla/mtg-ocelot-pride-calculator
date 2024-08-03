@@ -6,7 +6,12 @@ const calculateWithOnly = (
   guides: PositiveInteger,
   treasureTokens: PositiveInteger = 0,
 ) => {
-  return calculate(ocelots, guides, ocelots + guides, treasureTokens);
+  return calculate(
+    ocelots,
+    guides,
+    ocelots + guides + treasureTokens,
+    treasureTokens,
+  );
 };
 
 const calculateWithCitysBlessing = (
@@ -146,7 +151,7 @@ describe("calculate", () => {
 
     it("only doubles once the citys blessing is reached", () => {
       const ocelots = 2;
-      const permanents = 8;
+      const permanents = 6;
       const treasureTokens = 2;
       const result = calculate(ocelots, zeroGuides, permanents, treasureTokens);
 
