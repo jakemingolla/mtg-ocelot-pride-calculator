@@ -46,6 +46,14 @@ describe("calculate", () => {
       expect(result.catTokens).toBe(126);
     });
 
+    it("should handle up to thirty ocelots", () => {
+      const ocelots = 30;
+      const result = calculateWithCitysBlessing(ocelots, zeroGuides);
+
+      // Judge!
+      expect(result.catTokens).toBe(2147483646);
+    });
+
     it("should only double once citys blessing is reached", () => {
       const ocelots = 2;
       const guides = 0;
