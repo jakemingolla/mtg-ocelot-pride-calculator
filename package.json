@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "bun run src/index.ts",
+    "test": "bun run lint && bun test",
     "lint": "bun run typescript:check && bun run eslint:check && bun run prettier:check",
     "typescript:check": "tsc --noEmit",
     "eslint:check": "eslint . --max-warnings 0",
