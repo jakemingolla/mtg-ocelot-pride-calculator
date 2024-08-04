@@ -1,32 +1,32 @@
 import type { PositiveInteger } from "./types/positive-integer";
-import type { CreatureToken, Token } from "./types/tokens";
-import { isCreatureToken } from "./types/tokens";
+import { type Token, TokenType } from "./types/tokens";
 
 const CITYS_BLESSING = 10;
-const CAT_TOKEN: CreatureToken = "cat-token";
 
 const createTokensFromOcelotPrides = (
   remainingOcelots: PositiveInteger,
-  createdTokens: Record<Token, PositiveInteger>,
+  createdTokens: Token[],
   startingPermaments: PositiveInteger,
-): Record<Token, PositiveInteger> => {
+): Token[] => {
   if (remainingOcelots === 0) {
     return createdTokens;
   }
 
-  console.log(`Creating ${CAT_TOKEN}`);
-  createdTokens[CAT_TOKEN] += 1;
+  console.log(`Creating cat token from ocelot pride.`);
+  createdTokens.find((token) => token.name === "cat-token")!.count += 1;
 
   const totalPermanents =
     startingPermaments +
-    Object.values(createdTokens).reduce((acc, count) => acc + count, 0);
+    createdTokens.reduce((acc, token) => acc + token.count, 0);
 
   console.log(`There are ${totalPermanents} permanents.`);
 
   if (totalPermanents >= CITYS_BLESSING) {
-    Object.entries(createdTokens).forEach(([token, count]) => {
-      console.log(`Doubling ${token} from ${count} to ${count * 2}`);
-      createdTokens[token] = count * 2;
+    createdTokens.forEach((token) => {
+      console.log(
+        `Doubling ${token.name} from ${token.count} to ${token.count * 2}`,
+      );
+      token.count *= 2;
     });
   }
 
@@ -41,19 +41,26 @@ export const calculate = (
   ocelots: PositiveInteger,
   guides: PositiveInteger,
   permanents: PositiveInteger,
-  tokens: Record<Token, PositiveInteger>,
+  tokens: Token[] = [],
 ): {
   energy: PositiveInteger;
-  tokens: Record<Token, PositiveInteger>;
+  tokens: Token[];
 } => {
-  tokens[CAT_TOKEN] = 0;
+  const catToken: Token = {
+    name: "cat-token",
+    count: 0,
+    type: TokenType.CREATURE,
+  };
+
+  tokens.unshift(catToken);
 
   tokens = createTokensFromOcelotPrides(ocelots, tokens, permanents);
 
   // TODO handle noncreate tokens
-  const energy = Object.entries(tokens)
-    .filter(([token]) => isCreatureToken(token))
-    .reduce((acc, [, count]) => acc + count, 0);
+  const energy =
+    tokens
+      .filter((token) => token.type === TokenType.CREATURE)
+      .reduce((acc, token) => acc + token.count, 0) * guides;
 
   return {
     energy,

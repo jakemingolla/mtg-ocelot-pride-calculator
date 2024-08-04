@@ -1,5 +1,5 @@
 import { calculate } from "../../src";
-import type { Token, NonCreatureToken } from "../../src/types/tokens";
+import { TokenType, type Token } from "../../src/types/tokens";
 import type { PositiveInteger } from "../../src/types/positive-integer";
 
 const calculateWithOnly = (
@@ -7,9 +7,13 @@ const calculateWithOnly = (
   guides: PositiveInteger,
   treasureTokens: PositiveInteger = 0,
 ) => {
-  return calculate(ocelots, guides, ocelots + guides + treasureTokens, {
-    ["treasure-token" as NonCreatureToken]: treasureTokens,
-  });
+  return calculate(ocelots, guides, ocelots + guides + treasureTokens, [
+    {
+      name: "treasure-token",
+      count: treasureTokens,
+      type: TokenType.NON_CREATURE,
+    },
+  ]);
 };
 
 const calculateWithCitysBlessing = (
@@ -17,23 +21,25 @@ const calculateWithCitysBlessing = (
   guides: PositiveInteger,
   treasureTokens: PositiveInteger = 0,
 ) => {
-  return calculate(ocelots, guides, 10, {
-    ["treasure-token" as NonCreatureToken]: treasureTokens,
-  });
+  return calculate(ocelots, guides, 10, [
+    {
+      name: "treasure-token",
+      count: treasureTokens,
+      type: TokenType.NON_CREATURE,
+    },
+  ]);
 };
 
-const expectCatTokens = (
-  tokens: Record<Token, PositiveInteger>,
-  expected: PositiveInteger,
-) => {
-  expect(tokens["cat-token"]).toBe(expected);
+const expectCatTokens = (tokens: Token[], expected: PositiveInteger) => {
+  expect(tokens.find((token) => token.name === "cat-token")!.count).toBe(
+    expected,
+  );
 };
 
-const expectTreasueTokens = (
-  tokens: Record<Token, PositiveInteger>,
-  expected: PositiveInteger,
-) => {
-  expect(tokens["treasure-token"]).toBe(expected);
+const expectTreasueTokens = (tokens: Token[], expected: PositiveInteger) => {
+  expect(tokens.find((token) => token.name === "treasure-token")!.count).toBe(
+    expected,
+  );
 };
 
 const zeroGuides = 0;
@@ -80,7 +86,7 @@ describe("calculate", () => {
       const ocelots = 2;
       const guides = 0;
       const permanents = 8;
-      const result = calculate(ocelots, guides, permanents, {});
+      const result = calculate(ocelots, guides, permanents, []);
 
       expectCatTokens(result.tokens, 4);
     });
@@ -189,9 +195,13 @@ describe("calculate", () => {
       const ocelots = 2;
       const permanents = 6;
       const treasureTokens = 2;
-      const result = calculate(ocelots, zeroGuides, permanents, {
-        ["treasure-token" as NonCreatureToken]: treasureTokens,
-      });
+      const result = calculate(ocelots, zeroGuides, permanents, [
+        {
+          name: "treasure-token",
+          count: treasureTokens,
+          type: TokenType.NON_CREATURE,
+        },
+      ]);
 
       expectTreasueTokens(result.tokens, 4);
     });
