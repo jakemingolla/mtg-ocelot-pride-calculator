@@ -4,36 +4,48 @@ import { type Token, TokenType } from "./types/tokens";
 const CITYS_BLESSING = 10;
 
 const createTokensFromOcelotPrides = (
-  remainingOcelots: PositiveInteger,
+  currentOcelot: PositiveInteger,
+  totalOcelots: PositiveInteger,
   createdTokens: Token[],
   startingPermaments: PositiveInteger,
-): Token[] => {
-  if (remainingOcelots === 0) {
-    return createdTokens;
+  steps: string[],
+): { tokens: Token[]; steps: string[] } => {
+  // make note about 1-indexed
+  if (currentOcelot > totalOcelots) {
+    return { tokens: createdTokens, steps };
   }
 
-  console.log(`Creating cat token from ocelot pride.`);
+  steps.push(`Creating cat token for Ocelot Pride number ${currentOcelot}.`);
   createdTokens.find((token) => token.name === "cat-token")!.count += 1;
 
   const totalPermanents =
     startingPermaments +
     createdTokens.reduce((acc, token) => acc + token.count, 0);
 
-  console.log(`There are ${totalPermanents} permanents.`);
-
   if (totalPermanents >= CITYS_BLESSING) {
-    createdTokens.forEach((token) => {
-      console.log(
-        `Doubling ${token.name} from ${token.count} to ${token.count * 2}`,
-      );
-      token.count *= 2;
-    });
+    steps.push(
+      `City's blessing has been achieved with ${totalPermanents} total permanents.`,
+    );
+    createdTokens
+      .filter((token) => token.count > 0)
+      .forEach((token) => {
+        steps.push(
+          `Doubling ${token.name} from ${token.count} to ${token.count * 2}`,
+        );
+        token.count *= 2;
+      });
+  } else {
+    steps.push(
+      `City's blessing has not been achieved with ${totalPermanents} total permanents.`,
+    );
   }
 
   return createTokensFromOcelotPrides(
-    remainingOcelots - 1,
+    currentOcelot + 1,
+    totalOcelots,
     createdTokens,
     startingPermaments,
+    steps,
   );
 };
 
@@ -41,28 +53,44 @@ export const calculate = (
   ocelots: PositiveInteger,
   guides: PositiveInteger,
   permanents: PositiveInteger,
-  tokens: Token[] = [],
+  tokensCreatedThisTurn: Token[] = [],
 ): {
   energy: PositiveInteger;
   tokens: Token[];
+  steps: string[];
 } => {
-  const catToken: Token = {
-    name: "cat-token",
-    count: 0,
-    type: TokenType.CREATURE,
-  };
+  const catToken = tokensCreatedThisTurn.find(
+    (token) => token.name === "cat-token",
+  );
+  if (!catToken) {
+    tokensCreatedThisTurn.push({
+      name: "cat-token",
+      count: 0,
+      type: TokenType.CREATURE,
+    });
+  }
 
-  tokens.unshift(catToken);
+  const { tokens, steps } = createTokensFromOcelotPrides(
+    1,
+    ocelots,
+    tokensCreatedThisTurn,
+    permanents,
+    [],
+  );
 
-  tokens = createTokensFromOcelotPrides(ocelots, tokens, permanents);
+  const creatureTokens = tokens
+    .filter((token) => token.type === TokenType.CREATURE)
+    .reduce((acc, token) => acc + token.count, 0);
 
-  const energy =
-    tokens
-      .filter((token) => token.type === TokenType.CREATURE)
-      .reduce((acc, token) => acc + token.count, 0) * guides;
+  const energy = creatureTokens * guides;
+  steps.push(`There are ${guides} total Guide of Souls in play.`);
+  steps.push(
+    `There were ${creatureTokens} total creature tokens created, resulting in ${energy} energy.`,
+  );
 
   return {
     energy,
     tokens,
+    steps,
   };
 };

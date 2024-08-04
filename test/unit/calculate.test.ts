@@ -206,4 +206,49 @@ describe("calculate", () => {
       expectTreasueTokens(result.tokens, 4);
     });
   });
+
+  describe("steps", () => {
+    it("includes when the citys blessing is achieved", () => {
+      const ocelots = 1;
+      const guides = 1;
+      const result = calculateWithCitysBlessing(ocelots, guides);
+
+      expect(
+        result.steps.some((step) =>
+          step.includes("City's blessing has been achieved"),
+        ),
+      ).toBe(true);
+    });
+
+    it("includes when an ocelot creates a cat", () => {
+      const ocelots = 1;
+      const guides = 1;
+      const result = calculateWithCitysBlessing(ocelots, guides);
+
+      expect(result.steps).toContain(
+        "Creating cat token for Ocelot Pride number 1.",
+      );
+    });
+
+    it("includes when a token is doubled", () => {
+      const ocelots = 1;
+      const guides = 1;
+      const result = calculateWithCitysBlessing(ocelots, guides);
+
+      expect(result.steps).toContain("Doubling cat-token from 1 to 2");
+    });
+
+    it("does not include tokens with a count of zero", () => {
+      const ocelots = 1;
+      const guides = 1;
+      const treasureTokens = 0;
+      const result = calculateWithCitysBlessing(
+        ocelots,
+        guides,
+        treasureTokens,
+      );
+
+      expect(result.steps.some((step) => /treasure/i.test(step))).toBe(false);
+    });
+  });
 });
