@@ -1,6 +1,6 @@
-import { calculate } from "../../src";
-import { TokenType, type Token } from "../../src/types/tokens";
-import type { PositiveInteger } from "../../src/types/positive-integer";
+import { calculate } from "../../../src/core";
+import { TokenType, type Token } from "../../../src/types/tokens";
+import type { PositiveInteger } from "../../../src/types/positive-integer";
 
 const calculateWithOnly = (
   ocelots: PositiveInteger,

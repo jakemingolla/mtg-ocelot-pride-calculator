@@ -1,5 +1,5 @@
-import type { PositiveInteger } from "./types/positive-integer";
-import { type Token, TokenType } from "./types/tokens";
+import type { PositiveInteger } from "../types/positive-integer";
+import { type Token, TokenType } from "../types/tokens";
 
 const CITYS_BLESSING = 10;
 
