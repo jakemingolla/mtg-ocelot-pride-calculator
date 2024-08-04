@@ -1,6 +1,5 @@
 import * as ReactDOM from "react-dom/client";
 import * as React from "react";
-import { Component } from "./component";
 
 import { calculate } from "../core";
 import { TokenType } from "../types/tokens";
@@ -35,6 +34,8 @@ class Foo extends React.Component<Props, State> {
   handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     this.setState({
       [event.target.name]: parseInt(event.target.value, 10),
+      // TODO
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
   }
 
