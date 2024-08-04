@@ -56,7 +56,6 @@ export const calculate = (
 
   tokens = createTokensFromOcelotPrides(ocelots, tokens, permanents);
 
-  // TODO handle noncreate tokens
   const energy =
     tokens
       .filter((token) => token.type === TokenType.CREATURE)
