@@ -1,18 +1,31 @@
-import { test, expect } from "bun:test";
-import { renderToString } from "react-dom/server";
+import { cleanup, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+
 import { Component } from "../../../src/app/component";
 
-test("dom test", async () => {
-  document.body.innerHTML = renderToString(<Component />);
-  const input = document.querySelector(
-    'input[name="ocelots"]',
-  ) as HTMLInputElement;
+afterEach(() => {
+  cleanup();
+});
 
-  expect(input?.value).toEqual("1");
+test("basic test", async () => {
+  const user = userEvent.setup();
+  render(<Component />);
 
-  const button = document.querySelector("button") as HTMLButtonElement;
-  button.click();
+  await user.click(screen.getByText("Calculate"));
 
-  const energy = document.querySelector("p#energy") as HTMLDivElement;
-  expect(energy.textContent).toEqual("Energy: 1");
+  const energy = document.getElementById("energy");
+  expect(energy?.innerText).toBe("Energy: 1");
+});
+
+test("test with changed input", async () => {
+  const user = userEvent.setup();
+  render(<Component />);
+
+  const ocelots = document.getElementById("ocelots") as HTMLInputElement;
+  await user.type(ocelots, "{backspace}2");
+
+  await user.click(screen.getByText("Calculate"));
+
+  const energy = document.getElementById("energy");
+  expect(energy?.innerText).toBe("Energy: 2");
 });

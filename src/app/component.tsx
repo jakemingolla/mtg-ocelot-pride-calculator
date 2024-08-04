@@ -31,7 +31,8 @@ export class Component extends React.Component<Props, State> {
 
   handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     this.setState({
-      [event.target.name]: parseInt(event.target.value, 10),
+      // TODO this makes it so you can't delete the leading 0
+      [event.target.name]: parseInt(event.target.value || "0", 10),
       // TODO
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
@@ -52,7 +53,6 @@ export class Component extends React.Component<Props, State> {
       ocelots + guides + startingTreasureTokens,
       startingTokens,
     );
-    console.log("here", tokens);
     const catTokens = tokens.find((token) => token.name === "cat-token")!.count;
     const treasureTokens =
       tokens.find((token) => token.name === "treasure-token")?.count || 0;
@@ -63,24 +63,22 @@ export class Component extends React.Component<Props, State> {
     const { ocelots, guides, startingTreasureTokens } = this.state;
     return (
       <div>
-        <label>
-          Ocelots:
-          <input
-            type="number"
-            name="ocelots"
-            value={ocelots}
-            onChange={this.handleChange}
-          />
-        </label>
-        <label>
-          Guides:
-          <input
-            type="number"
-            name="guides"
-            value={guides}
-            onChange={this.handleChange}
-          />
-        </label>
+        <label htmlFor="ocelots">Ocelots:</label>
+        <input
+          id="ocelots"
+          type="number"
+          name="ocelots"
+          value={ocelots}
+          onChange={this.handleChange}
+        />
+        <label htmlFor="guides">Guides:</label>
+        <input
+          id="guides"
+          type="number"
+          name="guides"
+          value={guides}
+          onChange={this.handleChange}
+        />
         <label>
           Starting Treasure Tokens:
           <input
