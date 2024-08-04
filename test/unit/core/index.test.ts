@@ -1,6 +1,6 @@
-import { calculate } from "../../src";
-import { TokenType, type Token } from "../../src/types/tokens";
-import type { PositiveInteger } from "../../src/types/positive-integer";
+import { calculate } from "../../../src/core";
+import { TokenType, type Token } from "../../../src/types/tokens";
+import type { PositiveInteger } from "../../../src/types/positive-integer";
 
 const calculateWithOnly = (
   ocelots: PositiveInteger,
@@ -21,7 +21,7 @@ const calculateWithCitysBlessing = (
   guides: PositiveInteger,
   treasureTokens: PositiveInteger = 0,
 ) => {
-  return calculate(ocelots, guides, 10, [
+  return calculate(ocelots, guides, 100, [
     {
       name: "treasure-token",
       count: treasureTokens,
@@ -85,10 +85,21 @@ describe("calculate", () => {
     it("should only double once citys blessing is reached", () => {
       const ocelots = 2;
       const guides = 0;
-      const permanents = 8;
-      const result = calculate(ocelots, guides, permanents, []);
+      const totalPermanents = 8;
+      const result = calculate(ocelots, guides, totalPermanents, []);
+
+      console.log(result.steps);
 
       expectCatTokens(result.tokens, 4);
+    });
+
+    it("does not double count starting tokens towards citys blessing", () => {
+      const ocelots = 1;
+      const guides = 1;
+      const treasureTokens = 4;
+      const result = calculateWithOnly(ocelots, guides, treasureTokens);
+
+      expectCatTokens(result.tokens, 1);
     });
   });
 
@@ -158,7 +169,7 @@ describe("calculate", () => {
       expect(result.energy).toBe(1);
     });
 
-    it("should not count noncreature tokens with the cits blessing", () => {
+    it("should not count noncreature tokens with the citys blessing", () => {
       const ocelots = 1;
       const guides = 1;
       const treasureTokens = 1;
@@ -193,9 +204,9 @@ describe("calculate", () => {
 
     it("only doubles once the citys blessing is reached", () => {
       const ocelots = 2;
-      const permanents = 6;
+      const totalPermanents = 8;
       const treasureTokens = 2;
-      const result = calculate(ocelots, zeroGuides, permanents, [
+      const result = calculate(ocelots, zeroGuides, totalPermanents, [
         {
           name: "treasure-token",
           count: treasureTokens,

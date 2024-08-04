@@ -1,13 +1,15 @@
-import type { PositiveInteger } from "./types/positive-integer";
-import { type Token, TokenType } from "./types/tokens";
+import type { PositiveInteger } from "../types/positive-integer";
+import { type Token, TokenType } from "../types/tokens";
 
 const CITYS_BLESSING = 10;
 
 const createTokensFromOcelotPrides = (
   currentOcelot: PositiveInteger,
   totalOcelots: PositiveInteger,
+  totalGuides: PositiveInteger,
   createdTokens: Token[],
-  startingPermaments: PositiveInteger,
+  // TODO note about avoiding double count
+  additionalPermanents: PositiveInteger,
   steps: string[],
 ): { tokens: Token[]; steps: string[] } => {
   // make note about 1-indexed
@@ -19,7 +21,9 @@ const createTokensFromOcelotPrides = (
   createdTokens.find((token) => token.name === "cat-token")!.count += 1;
 
   const totalPermanents =
-    startingPermaments +
+    totalOcelots +
+    totalGuides +
+    additionalPermanents +
     createdTokens.reduce((acc, token) => acc + token.count, 0);
 
   if (totalPermanents >= CITYS_BLESSING) {
@@ -43,8 +47,9 @@ const createTokensFromOcelotPrides = (
   return createTokensFromOcelotPrides(
     currentOcelot + 1,
     totalOcelots,
+    totalGuides,
     createdTokens,
-    startingPermaments,
+    additionalPermanents,
     steps,
   );
 };
@@ -52,7 +57,7 @@ const createTokensFromOcelotPrides = (
 export const calculate = (
   ocelots: PositiveInteger,
   guides: PositiveInteger,
-  permanents: PositiveInteger,
+  totalPermanents: PositiveInteger,
   tokensCreatedThisTurn: Token[] = [],
 ): {
   energy: PositiveInteger;
@@ -70,11 +75,18 @@ export const calculate = (
     });
   }
 
+  const additionalPermanents =
+    totalPermanents -
+    ocelots -
+    guides -
+    tokensCreatedThisTurn.reduce((acc, token) => acc + token.count, 0);
+
   const { tokens, steps } = createTokensFromOcelotPrides(
     1,
     ocelots,
+    guides,
     tokensCreatedThisTurn,
-    permanents,
+    additionalPermanents,
     [],
   );
 
